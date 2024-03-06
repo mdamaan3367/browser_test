@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nestor</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+  }
+
+
+  .container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+  }
+
+
+  .search-bar {
+    display: flex;
+    margin-bottom: 20px;
+  }
+
+  .search-bar input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+  }
+
+  .search-bar button {
+    padding: 10px;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+
+  .search-bar button:hover {
+    background-color: #45a049;
+  }
+
+  .tabs-container {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .tab {
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+    margin-right: 5px;
+    color: #333;
+  }
+
+  .tab.active {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .tab-close {
+    margin-left: 5px;
+    cursor: pointer;
+    color: #999;
+  }
+
+ 
+  .iframe-container {
+    width: 100%;
+    height: 600px;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: auto;
+  }
+
+  .iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1><i class="fas fa-globe"></i> Nestor Analytics</h1>
+    <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="Search">
+      <button onclick="search()"><i class="fas fa-search"></i> Search</button>
+    </div>
+  </div>
+  <ul id="tabs-container" class="tabs-container"></ul>
+  <div id="iframe-container" class="iframe-container"></div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    let tabCounter = 1;
+
+    function addTab(url) {
+      const tabId = `tab-${tabCounter}`;
+      const tabContent = `<li class="tab" id="${tabId}" onclick="switchTab('${tabId}', '${url}')">${url}<span class="tab-close" onclick="closeTab('${tabId}')"><i class="fas fa-times"></i></span></li>`;
+      document.getElementById('tabs-container').insertAdjacentHTML('beforeend', tabContent);
+      document.getElementById(tabId).classList.add('active');
+      loadURL(url, tabId);
+      tabCounter++;
+    }
+
+    window.closeTab = function(tabId) {
+      document.getElementById(tabId).remove();
+      document.getElementById(tabId.replace('tab', 'iframe')).remove();
+      const activeTab = document.querySelector('.tab.active');
+      if (!activeTab) return;
+      loadURL(activeTab.textContent, activeTab.id);
+    };
+
+    window.switchTab = function(tabId, url) {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        if (tab.id === tabId) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+      loadURL(url, tabId);
+    };
+
+    function loadURL(url, tabId) {
+      const iframeId = tabId.replace('tab', 'iframe');
+      const iframe = document.getElementById(iframeId);
+      if (!iframe) {
+        const iframeContent = `<iframe id="${iframeId}" src="${url}" frameborder="0"></iframe>`;
+        document.getElementById('iframe-container').innerHTML = iframeContent;
+      } else {
+        iframe.src = url;
+      }
+    }
+
+    window.search = function() {
+      const query = document.getElementById('searchInput').value;
+      if (query.trim() === '') return;
+      const searchURL = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+      addTab(searchURL);
+      document.getElementById('searchInput').value = '';
+    };
+
+    addTab('https://www.example.com');
+  });
+</script>
+
+</body>
+</html>
